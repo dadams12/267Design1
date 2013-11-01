@@ -1,0 +1,122 @@
+% TEMPLATE for Usenix papers, specifically to meet requirements of
+%  USENIX '05
+% originally a template for producing IEEE-format articles using LaTeX.
+%   written by Matthew Ward, CS Department, Worcester Polytechnic Institute.
+% adapted by David Beazley for his excellent SWIG paper in Proceedings,
+%   Tcl 96
+% turned into a smartass generic template by De Clarke, with thanks to
+%   both the above pioneers
+% use at your own risk.  Complaints to /dev/null.
+% make it two column with no page numbering, default is 10 point
+
+% Munged by Fred Douglis <douglis@research.att.com> 10/97 to separate
+% the .sty file from the LaTeX source template, so that people can
+% more easily include the .sty file into an existing document.  Also
+% changed to more closely follow the style guidelines as represented
+% by the Word sample file. 
+
+% Note that since 2010, USENIX does not require endnotes. If you want
+% foot of page notes, don't include the endnotes package in the 
+% usepackage command, below.
+
+% This version uses the latex2e styles, not the very ancient 2.09 stuff.
+\documentclass[letterpaper,10pt]{article}
+\usepackage{epsfig,graphicx,usenix,fullpage, hyperref}
+
+
+%\usepackage{endnotes}
+\begin{document}
+
+
+%make title bold and 14 pt font (Latex default is non-bold, 16 pt)
+\title{\Large \bf 6.267 Design Project 1}
+%for single author (just remove % characters)
+\author{
+{\rm Colleen Josephson}\\
+cjoseph@mit.edu
+\and
+{\rm Dave Adams}\\
+dcadams@mit.edu
+% copy the following lines to add more authors
+% \and
+% {\rm Name}\\
+%Name Institution
+} % end author
+
+\date{Nov. 11, 2013}
+
+\maketitle
+
+% Use the following at camera-ready time to suppress page numbers.
+% Comment it out when you first submit the paper for review.
+%\thispagestyle{empty}
+
+\section{Introduction}
+blah blah blah
+
+\subsection{Assumptions}
+
+Throughout the design process, we worked with few important assumptions, which
+we believe are reasonable. These are outlined below.
+
+\begin{itemize}
+\item The wired network is much faster than the wireless network
+\item Movement of the devices will typically be no faster than 5mph (a slow jog)
+\item Computation is cheap at the gateway, slightly less cheap at hotspots.
+\item All hotspots are one hop away from the gateway
+\item The access points and mobile users are capable of MIMO. Users have at 
+least two antennas. 
+\item There will be a pre-computed table of the nearest neighbors to any 
+hotspot, developed from floorplans and kept updated by the network manager
+\end{itemize}
+
+\section{Design} \label{sec:design}
+
+In this section we discuss our design goals, and outline how our system
+meets these goals. We discuss the details of the routing protocol and provide 
+examples of typical operating scenarios.
+
+\subsection{Goals}
+The primary goals of this system is to minimize the amount of user 
+intervention that is necessary, and to maximize the connectivity.
+We aim to never have the user unable to send or receive packets while 
+transitioning from access point to access point, unless the user enters an area
+that has no coverage, such as a tunnel or elevator. If a user does lose coverage,
+we aim to have the user rapidly reconnected as soon as they are in range again.
+We do not to waste too much capacity ensuring these smooth coverage area 
+ransitions--our goals above could be met by simply broadcasting the packets
+from every access point, but this would lead to terrible throughput.
+
+\subsection{Protocol Outline}
+
+Scenarios: user walking down hall, stationary users, users walking past
+a heavily loaded access point (e.g. lecture hall).
+
+\section{Analysis}
+
+In this section we analyze how well our design performs. We also discuss 
+engineering tradeoffs, and possible solutions to new problems introduced by 
+our approach.
+
+\subsection{Performance}
+How often do the access points need to send updates in order for the
+user to never lose coverage if walking continuously in a complete coverage 
+area at 5mph or less? Is this load reasonable?
+
+\subsection{Edge Cases}
+Exceeding 5mph, transience through areas with no hotspots, gateway failure, 
+hotspot failure, sudden device disconnects, very high and very low loads.
+
+\section{Conclusion}
+blah blah blah
+
+{\footnotesize \bibliographystyle{acm}
+\bibliography{paper}}
+
+\end{document}
+
+
+
+
+
+
