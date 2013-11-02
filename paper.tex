@@ -20,7 +20,7 @@
 % usepackage command, below.
 
 % This version uses the latex2e styles, not the very ancient 2.09 stuff.
-\documentclass[letterpaper,10pt]{article}
+\documentclass[letterpaper,12pt]{article}
 \usepackage{epsfig,graphicx,usenix,fullpage, hyperref}
 
 
@@ -43,7 +43,7 @@ dcadams@mit.edu
 %Name Institution
 } % end author
 
-\date{Nov. 11, 2013}
+\date{Nov. 8, 2013}
 
 \maketitle
 
@@ -52,7 +52,20 @@ dcadams@mit.edu
 %\thispagestyle{empty}
 
 \section{Introduction}
-blah blah blah
+
+Wireless networks introduce many difficult challenges, and the increasing 
+mobilty of users only exacerbates these issues. Users want to be able to walk 
+from place to place with continuous and automatic network connectivity. Most
+modern wireless networks have quite poor support for moving users, however.
+The connection must usually be re-established when the user finally becomes
+stationary. The problem is that by the time a moving user establishes a 
+connection with an access point, they are moving out of range. 
+
+Wireless access points have a relatively stable topology in most buildings.
+This information can be used to figure out where a user is likely to go 
+next so the access point can be ready to interact with the user seamlessly.
+Most currently deployed schemes do not take advantage of these properties.
+We aim 
 
 \subsection{Assumptions}
 
@@ -92,6 +105,54 @@ from every access point, but this would lead to terrible throughput.
 Scenarios: user walking down hall, stationary users, users walking past
 a heavily loaded access point (e.g. lecture hall).
 
+\begin{itemize}
+\item Use floor plans to create a list of 2 nearest neighbors to any access point
+
+\item use nearest neighbor list as basis for a markov chain
+
+\item markov chain is further developed by watching patterns of where users tend 
+to move to from a given state (this is particularly helpful in the case that a user
+enters an elevator or tunnel, since movement is not continuous there)
+
+\item the router broadcasts to a subset of the nodes, which includes the node 
+that the user's SNR is strongest at as well as at least 2 neighboring nodes
+
+\item how to select how many nodes to transmit to, if many are possible in the
+list of next states? Thought: select nodes whose probability of being the next 
+state is at least 20 percent, or 3 nodes (whichever is greater). If no nodes
+have a prbability of at least 20 percent, as may be the case with a node next 
+to an elevator that goes up to 10 equally likely floors, then we ignore the 20 
+percent rule and broadcast to some alternative subset the network maintainer sets.
+Continuing the elevator example, if the tallest building in the network contains
+ten stories, then a reasonable alternative would be broadcasting to all ten
+access points in the elevator lobbies.
+
+Alternatively, different classes of access point could exist and be input
+permanetly into the gateway. An elevator lobby access point would have one
+set of rules, the hallway access points another, etc. This would be 
+much more annoying to set up, but it would only have to be done once.
+
+\item each access point periodcially takes a snapshot of all the users it has
+talked to in the past period and the average SNR, and sends this information
+to the gateway. The gateway then makes decisions on which access points
+should broadcast for which users, and sends out that information.
+A user is considered to  have changed states if the SNR is now stronger at a 
+different access point than before. 
+
+\item upon receiving updates, gateway also updates markov model before deleting
+previous state information. This way, we have a learning markov model!
+
+\item have users send out chirps at least once per second so the APs can 
+maintain accurate livliness and SNR data for users who an're xmitting 
+continuously? Don't think it will add much overhead, since we can piggyback 
+it onto something like the wireless rate selection probe packets.
+
+\end{itemize}
+
+\subsubsection{Markov Model}
+How is the markov model maintained? Talk about markov maintenance overhead
+in performance section.
+
 \section{Analysis}
 
 In this section we analyze how well our design performs. We also discuss 
@@ -99,9 +160,44 @@ engineering tradeoffs, and possible solutions to new problems introduced by
 our approach.
 
 \subsection{Performance}
-How often do the access points need to send updates in order for the
-user to never lose coverage if walking continuously in a complete coverage 
-area at 5mph or less? Is this load reasonable?
+One primary concern is the amount of routing traffic necessary to track
+users satisfactoraly. We have designed the system to perform reliably
+up to movements of 5pmh, which is a slow jog. 5mph translates to approximately
+2.24 meters per second. If we assume that access points are typically 10 or more
+meters apart, then a user will be reasonably tracked if the access points
+send one update packet per second. If moving continuously down a well-covered
+hallway, a user moving less than 5mph will take 4 or more seconds to pass
+through an access point's coverage area. 
+
+How reasonable is the traffic incurred by one routing update every 2 seconds? 
+If the gateway responds to each update period before the next period starts,
+this means an average of 1 update per wired link per second (one for the 
+access point, and another for the gateway's response). Are we going to do
+any TCP/reliability, or assume that the wire line is reliable enough?
+Are the links bi-directional, or will traffic to the gateway have to
+compete with traffic from the gateway?
+
+Another concern is interference caused by multiple access points broadcasting 
+the same packets simultaneously. This leads to a reduction in the number
+of possible users in the system, since each user has at least three times
+as much traffic. Additionally, the spatial overlap of some access points leads
+to concerns about destructive interference. 
+
+A performance hit is unavoidable if each user is suddenly causing more packets
+to be broadcast across the system. If an average  user has 3 access points
+broadcasting to it simultaneously, then the system can support only a third of
+the users it did before. A performance cut of small constant factor is quite
+reasonable, however. It can be somewhat ameliorated by simply adding more access 
+points. We say somewhat because suddenly increasing density of the network could
+have unexpected consequences, such as the destructive interference concern 
+mentioned above. In most systems, additional access points will probably only
+need to be added in areas that tend to get very crowded, such as a lecture hall,
+since many wireless networks often have mostly lightly loaded access points.
+
+One possible way to reduce interference concerns is to use a network coding 
+scheme so that the acess points are not sending identical packets. However,
+routing and tracking of users is the primary purpose of this protocol so 
+we will only suggest this idea as a possible extension.
 
 \subsection{Edge Cases}
 Exceeding 5mph, transience through areas with no hotspots, gateway failure, 
