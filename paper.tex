@@ -115,7 +115,7 @@ Scenarios: user walking down hall, stationary users, users walking past
 a heavily loaded access point (e.g. lecture hall).
 
 \begin{itemize}
-\item Use floor plans to create a list of 2 nearest neighbors to any access point
+\item Use floor plans to create a list of $\le m$ nearest neighbors to any access point
 
 \item use nearest neighbor list as basis for a markov chain
 
@@ -124,7 +124,9 @@ to move to from a given state (this is particularly helpful in the case that a u
 enters an elevator or tunnel, since movement is not continuous there)
 
 \item the router broadcasts to a subset of the nodes, which includes the node 
-that the user's SNR is strongest at as well as at least 2 neighboring nodes
+that the user's SNR is strongest at as well as the (at most) $m$ neighboring nodes
+
+\item The access points must take a measurement of the data, for example a timestamp or SNR estimate, to pass on to the gateway in order to compute the principal access point associated with a user.  These measurements are passed to the gateway with a period of $\tau$.  Thus, an intelligent way to select the number of "neighbors" of a principal access point $j$ would be the set of access points to which transition probability from $j$ in time $\tau$ is nonzero.
 
 \item how to select how many nodes to transmit to, if many are possible in the
 list of next states? Thought: select nodes whose probability of being the next 
@@ -158,9 +160,13 @@ it onto something like the wireless rate selection probe packets.
 
 \end{itemize}
 
+\subsubsection{Principal Assignment}
+Each mobile will be assigned a principal access point (``principal") based on SNR estimations.
+
+[mathematical definitions go here]
+
 \subsubsection{Markov Model}
-How is the markov model maintained? Talk about markov maintenance overhead
-in performance section.
+[Working on some mathematical definitions for a Markov model to go here]
 
 \section{Analysis}
 
